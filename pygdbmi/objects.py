@@ -20,23 +20,15 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-class ResultRecord:
-    def __init__(self, token):
-        self._token = token
+import enum
 
-    @property
-    def token(self):
-        return self._token
+
+class ResultRecord:
+    pass
 
 
 class DoneResultRecord(ResultRecord):
-    def __init__(self, token, results):
-        self._results = results
-        super().__init__(token)
-
-    @property
-    def results(self):
-        return self._results
+    pass
 
 
 class ConnectedResultRecord(ResultRecord):
@@ -44,10 +36,9 @@ class ConnectedResultRecord(ResultRecord):
 
 
 class ErrorResultRecord(ResultRecord):
-    def __init__(self, token, msg, code):
+    def __init__(self, msg, code):
         self._msg = msg
         self._code = code
-        super().__init__(token)
 
     @property
     def msg(self):
@@ -60,3 +51,119 @@ class ErrorResultRecord(ResultRecord):
 
 class ExitResultRecord(ResultRecord):
     pass
+
+
+class StreamRecord:
+    def __init__(self, text):
+        self._text = text
+
+    @property
+    def text(self):
+        return self._text
+
+
+class ConsoleOutput(StreamRecord):
+    def __init__(self, text):
+        super().__init__(text)
+
+
+class TargetOutput(StreamRecord):
+    def __init__(self, text):
+        super().__init__(text)
+
+
+class LogOutput(StreamRecord):
+    def __init__(self, text):
+        super().__init__(text)
+
+
+class AsyncRecord:
+    pass
+
+
+class ExecAsyncOutput(AsyncRecord):
+    pass
+
+
+class StatusAsyncOutput(AsyncRecord):
+    pass
+
+
+class NotifyAsyncOutput(AsyncRecord):
+    pass
+
+
+class RunningAsyncOutput(ExecAsyncOutput):
+    def __init__(self, thread_id):
+        self._thread_id = thread_id
+
+    @property
+    def thread_id(self):
+        return self._thread_id
+
+
+@enum.unique
+class StopReason(enum.Enum):
+    BREAKPOINT_HIT = 0
+    WATCHPOINT_TRIGGER = 1
+    READ_WATCHPOINT_TRIGGER = 2
+    ACCESS_WATCHPOINT_TRIGGER = 3
+    FUNCTION_FINISHED = 4
+    LOCATION_REACHED = 5
+    WATCHPOINT_SCOPE = 6
+    END_STEPPING_RANGE = 7
+    EXITED_SIGNALLED = 8
+    EXITED = 9
+    EXITED_NORMALLY = 10
+    SIGNAL_RECEIVED = 11
+    SOLIB_EVENT = 12
+    FORK = 13
+    VFORK = 14
+    SYSCALL_ENTRY = 15
+    SYSCALL_EXIT = 16
+    EXEC = 17
+
+
+class StoppedAsyncOutput(ExecAsyncOutput):
+    def __init__(self, reason, thread_id, stopped_thread_ids, core):
+        self._reason = reason
+        self._thread_id = thread_id
+        self._stopped_thread_ids = stopped_thread_ids
+        self._core = core
+
+    @property
+    def reason(self):
+        return self._reason
+
+    @property
+    def thread_id(self):
+        return self._thread_id
+
+    @property
+    def stopped_thread_ids(self):
+        return self._stopped_thread_ids
+
+    def all_threads_stopped(self):
+        return self._stopped_thread_ids == 'all'
+
+    @property
+    def core(self):
+        return self._core
+
+
+class ThreadGroupAddedAsyncOutput(ExecAsyncOutput):
+    def __init__(self, thread_group_id):
+        self._thread_group_id = thread_group_id
+
+    @property
+    def thread_group_id(self):
+        return self._thread_group_id
+
+
+class ThreadGroupRemovedAsyncOutput(ExecAsyncOutput):
+    def __init__(self, thread_group_id):
+        self._thread_group_id = thread_group_id
+
+    @property
+    def thread_group_id(self):
+        return self._thread_group_id
