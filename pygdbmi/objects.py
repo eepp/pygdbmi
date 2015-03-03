@@ -120,7 +120,7 @@ class StopReason(enum.Enum):
     FORK = 13
     VFORK = 14
     SYSCALL_ENTRY = 15
-    SYSCALL_EXIT = 16
+    SYSCALL_RETURN = 16
     EXEC = 17
 
 
@@ -151,7 +151,7 @@ class StoppedAsyncOutput(ExecAsyncOutput):
         return self._core
 
 
-class ThreadGroupAddedAsyncOutput(ExecAsyncOutput):
+class ThreadGroupAddedAsyncOutput(NotifyAsyncOutput):
     def __init__(self, thread_group_id):
         self._thread_group_id = thread_group_id
 
@@ -160,10 +160,108 @@ class ThreadGroupAddedAsyncOutput(ExecAsyncOutput):
         return self._thread_group_id
 
 
-class ThreadGroupRemovedAsyncOutput(ExecAsyncOutput):
+class ThreadGroupRemovedAsyncOutput(NotifyAsyncOutput):
     def __init__(self, thread_group_id):
         self._thread_group_id = thread_group_id
 
     @property
     def thread_group_id(self):
         return self._thread_group_id
+
+
+class ThreadGroupStartedAsyncOutput(NotifyAsyncOutput):
+    def __init__(self, thread_group_id, pid):
+        self._thread_group_id = thread_group_id
+        self._pid = pid
+
+    @property
+    def thread_group_id(self):
+        return self._thread_group_id
+
+    @property
+    def pid(self):
+        return self._pid
+
+
+class ThreadGroupExitedAsyncOutput(NotifyAsyncOutput):
+    def __init__(self, thread_group_id, exit_code):
+        self._thread_group_id = thread_group_id
+        self._exit_code = exit_code
+
+    @property
+    def thread_group_id(self):
+        return self._thread_group_id
+
+    @property
+    def exit_code(self):
+        return self._exit_code
+
+
+class ThreadCreatedAsyncOutput(NotifyAsyncOutput):
+    def __init__(self, thread_id, thread_group_id):
+        self._thread_id = thread_id
+        self._thread_group_id = thread_group_id
+
+    @property
+    def thread_id(self):
+        return self._thread_id
+
+    @property
+    def thread_group_id(self):
+        return self._thread_group_id
+
+
+class ThreadExitedAsyncOutput(NotifyAsyncOutput):
+    def __init__(self, thread_id, thread_group_id):
+        self._thread_id = thread_id
+        self._thread_group_id = thread_group_id
+
+    @property
+    def thread_id(self):
+        return self._thread_id
+
+    @property
+    def thread_group_id(self):
+        return self._thread_group_id
+
+
+class ThreadSelectedAsyncOutput(NotifyAsyncOutput):
+    def __init__(self, thread_id):
+        self._thread_id = thread_id
+
+    @property
+    def thread_id(self):
+        return self._thread_id
+
+
+class RecordStartedAsyncOutput(NotifyAsyncOutput):
+    def __init__(self, thread_group_id):
+        self._thread_group_id = thread_group_id
+
+    @property
+    def thread_group_id(self):
+        return self._thread_group_id
+
+
+class RecordStoppedAsyncOutput(NotifyAsyncOutput):
+    def __init__(self, thread_group_id):
+        self._thread_group_id = thread_group_id
+
+    @property
+    def thread_group_id(self):
+        return self._thread_group_id
+
+
+class CmdParamChangedAsyncOutput(NotifyAsyncOutput):
+    def __init__(self, params, value):
+        self._params = params
+        self._value = value
+
+    @property
+    def params(self):
+        return self._params
+
+    @property
+    def value(self):
+        return self._value
+
